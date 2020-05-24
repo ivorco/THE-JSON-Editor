@@ -19,7 +19,7 @@ using System.Windows.Shapes;
 
 namespace THE_JSON_Editor
 {
-    public class Complex : INotifyPropertyChanged
+    public class ComplexValue : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -28,9 +28,14 @@ namespace THE_JSON_Editor
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public Complex()
+        public ComplexValue()
         {
-            Complexes = new ObservableCollection<Complex>();
+            ComplexValues = new ObservableCollection<ComplexValue>();
+        }
+
+        private void ComplexValue_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(ComplexValues));
         }
 
         private string _name;
@@ -44,42 +49,26 @@ namespace THE_JSON_Editor
             }
         }
 
-        private ObservableCollection<Complex> _complex = null;
-        public ObservableCollection<Complex> Complexes
+        private string _value;
+        public string Value
         {
-            get => _complex;
+            get => _value;
             set
             {
-                _complex = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public class ViewModel : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
-        private ObservableCollection<Complex> _complex = null;
-        public ObservableCollection<Complex> Complexes
-        {
-            get => _complex;
-            set
-            {
-                _complex = value;
+                _value = value;
                 OnPropertyChanged();
             }
         }
 
-        public ViewModel()
+        private ObservableCollection<ComplexValue> _complexValues = null;
+        public ObservableCollection<ComplexValue> ComplexValues
         {
-            Complexes = new ObservableCollection<Complex>();
-            Complexes.Add(new Complex() { Name = "TestComplexSub" });
+            get => _complexValues;
+            set
+            {
+                _complexValues = value;
+                OnPropertyChanged();
+            }
         }
     }
 
@@ -87,7 +76,19 @@ namespace THE_JSON_Editor
     {
         public MainWindow()
         {
+            DataContextChanged += DataContextLoaded;
+
             InitializeComponent();
+        }
+
+        private void DataContextLoaded(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var vm = (ComplexValue)DataContext;
+            var TestComplexSubFirst = new ComplexValue() { Name = "TestComplexSubFirst" };
+            TestComplexSubFirst.ComplexValues.Add(new ComplexValue() { Name = "TestComplexSubSubFirst" });
+            vm.ComplexValues.Add(TestComplexSubFirst);
+
+            DataContextChanged -= DataContextLoaded;
         }
     }
 }
