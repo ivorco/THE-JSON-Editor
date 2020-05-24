@@ -31,7 +31,6 @@ namespace THE_JSON_Editor
         public Complex()
         {
             Complexes = new ObservableCollection<Complex>();
-            //Values = new ObservableConcurrentDictionary<string, object>();
         }
 
         private string _name;
@@ -44,17 +43,6 @@ namespace THE_JSON_Editor
                 OnPropertyChanged();
             }
         }
-
-        //private ObservableConcurrentDictionary<string, object> _values;
-        //public ObservableConcurrentDictionary<string, object> Values
-        //{
-        //    get => _values;
-        //    set
-        //    {
-        //        _values = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
 
         private ObservableCollection<Complex> _complex = null;
         public ObservableCollection<Complex> Complexes
@@ -77,20 +65,21 @@ namespace THE_JSON_Editor
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public Complex _mainComplex;
-        public Complex MainComplex
+        private ObservableCollection<Complex> _complex = null;
+        public ObservableCollection<Complex> Complexes
         {
-            get => _mainComplex;
+            get => _complex;
             set
             {
-                _mainComplex = value;
+                _complex = value;
                 OnPropertyChanged();
             }
         }
 
         public ViewModel()
         {
-            MainComplex = new Complex { Name = "JSON" };
+            Complexes = new ObservableCollection<Complex>();
+            Complexes.Add(new Complex() { Name = "TestComplexSub" });
         }
     }
 
@@ -99,13 +88,6 @@ namespace THE_JSON_Editor
         public MainWindow()
         {
             InitializeComponent();
-
-            var vm = new ViewModel();
-            DataContext = vm;
-
-            //vm.MainComplex.Values.Add("TestNumber", 1);
-            //vm.MainComplex.Values.Add("TestString", "abc");
-            vm.MainComplex.Complexes.Add(new Complex() { Name = "TestComplexSub" });
         }
     }
 }

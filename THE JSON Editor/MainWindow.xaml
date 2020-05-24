@@ -6,11 +6,16 @@
         xmlns:local="clr-namespace:THE_JSON_Editor"
         mc:Ignorable="d"
         Title="THE JSON Editor" Height="450" Width="800" WindowStartupLocation="CenterScreen">
-    <Window.Resources>
-        <HierarchicalDataTemplate x:Key="ComplexDataTemplate" DataType="{x:Type local:Complex}" ItemsSource="{Binding Complexes}">
-            <Label Content="{Binding Name}"/>
-        </HierarchicalDataTemplate>
-    </Window.Resources>
-
-    <TreeView ItemsSource="{Binding Complexes}" ItemTemplate="{StaticResource ComplexDataTemplate}"/>
+    
+    <Window.DataContext>
+        <local:ViewModel/>
+    </Window.DataContext>
+    
+    <TreeView ItemsSource="{Binding Complexes}">
+        <TreeView.ItemTemplate>
+            <HierarchicalDataTemplate ItemsSource="{Binding Complexes}">
+                <Label Content="{Binding Name}"/>
+            </HierarchicalDataTemplate>
+        </TreeView.ItemTemplate>
+    </TreeView>
 </Window>
