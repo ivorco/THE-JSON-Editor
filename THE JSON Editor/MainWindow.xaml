@@ -6,16 +6,42 @@
         xmlns:local="clr-namespace:THE_JSON_Editor"
         mc:Ignorable="d"
         Title="THE JSON Editor" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <HierarchicalDataTemplate x:Key="ComplexValueTemplate" ItemsSource="{Binding ComplexValues}">
+            <Label Content="{Binding Name}" />
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="TableTemplate">
+            <StackPanel Orientation="Vertical">
+                <!--<Label Content="{Binding Name}" />-->
+
+                <ListBox ItemsSource="{Binding ComplexValues}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <Run Text="{Binding Name}"/><Run Text=": "/><Run Text="{Binding Value}"/>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="ValueTemplate">
+            <TextBlock>
+                <Run Text="{Binding Name}"/><Run Text=": "/><Run Text="{Binding Value}"/>
+            </TextBlock>
+        </HierarchicalDataTemplate>
+
+        <local:ComplexValueTemplateSelector x:Key="ComplexValueTemplateSelector"/>
+    </Window.Resources>
 
     <Window.DataContext>
         <local:ComplexValue/>
     </Window.DataContext>
 
-    <TreeView ItemsSource="{Binding ComplexValues}">
-        <TreeView.ItemTemplate>
-            <HierarchicalDataTemplate ItemsSource="{Binding ComplexValues}">
-                <Label Content="{Binding Name}"/>
-            </HierarchicalDataTemplate>
-        </TreeView.ItemTemplate>
-    </TreeView>
+    <TreeView ItemsSource="{Binding ComplexValues}" ItemTemplateSelector="{StaticResource ComplexValueTemplateSelector}" DragDrop.Drop="TreeView_Drop" AllowDrop="true"/>
 </Window>
