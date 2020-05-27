@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,6 +24,12 @@ using System.Windows.Shapes;
 
 namespace THE_JSON_Editor
 {
+    public enum CValueType
+    {
+        Root,
+        Item,
+    }
+
     public class ComplexValue : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -73,10 +81,40 @@ namespace THE_JSON_Editor
                 OnPropertyChanged();
             }
         }
+
+        private CValueType? _type = null;
+        public CValueType? Type
+        {
+            get => _type;
+            set
+            {
+                _type = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
     public class ComplexValueTemplateSelector : DataTemplateSelector
     {
+        private static JsonSerializerSettings microsoftDateFormatSettings = new JsonSerializerSettings
+        {
+            DateFormatHandling = DateFormatHandling.MicrosoftDateFormat
+        };
+
+        private T DeserializeJSONValue<T>(object value)
+        {
+            try
+            {
+                var data = $@"{{""value"":""{value.ToString()}""}}";
+
+                return JsonConvert.DeserializeAnonymousType(data, new { value = default(T) }, new JsonSerializerSettings { DateParseHandling = DateParseHandling.DateTime }).value;
+            }
+            catch (Exception ex)
+            {
+                return default(T);
+            }
+        }
+
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             var window = Application.Current.MainWindow;
@@ -86,13 +124,24 @@ namespace THE_JSON_Editor
             {
                 if (comp.ComplexValues.Any())
                 {
-                    if (comp.Name == "ITEM" && comp.ComplexValues.All(compv => !compv.ComplexValues.Any()))
+                    if (comp.Type == CValueType.Item && comp.ComplexValues.All(compv => !compv.ComplexValues.Any()))
                         resName = "TableTemplate";
                     else
                         resName = "ComplexValueTemplate";
                 }
                 else
-                    resName = "ValueTemplate";
+                {
+                    var date = DeserializeJSONValue<DateTime?>(comp.Value);
+                    if (date.HasValue)
+                    {
+                        resName = "DateTemplate";
+                        comp.Value = date.Value;
+                    }
+                    else if (comp.Value is string str && comp.Name.ToLower().Contains("id"))
+                        resName = "IDTemplate";
+                    else
+                        resName = "ValueTemplate";
+                }
             }
 
             return window.Resources[resName] as DataTemplate;
@@ -141,13 +190,13 @@ namespace THE_JSON_Editor
 
             if (d is Array arr)
             {
-                value.Name = "ROOT";
+                value.Type = CValueType.Root;
 
                 var items = arr.OfType<dynamic>().Select(item => GetComplexValueFromDynamic(item));
                 foreach (var item in items)
                 {
                     value.ComplexValues.Add(item);
-                    value.ComplexValues.Last().Name = "ITEM";
+                    value.ComplexValues.Last().Type = CValueType.Item;
                 }
             }
             else if (d is Dictionary<string, object> dic)

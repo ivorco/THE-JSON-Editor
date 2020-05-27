@@ -30,12 +30,25 @@
                 </ListBox>
             </StackPanel>
         </HierarchicalDataTemplate>
+        
         <HierarchicalDataTemplate x:Key="ValueTemplate">
             <TextBlock>
                 <Run Text="{Binding Name}"/><Run Text=": "/><Run Text="{Binding Value}"/>
             </TextBlock>
         </HierarchicalDataTemplate>
+        
+        <HierarchicalDataTemplate x:Key="IDTemplate">
+            <TextBlock FontSize="5">
+                <Run Text="{Binding Name}"/><Run Text=": "/><Run Text="{Binding Value}"/>
+            </TextBlock>
+        </HierarchicalDataTemplate>
 
+        <HierarchicalDataTemplate x:Key="DateTemplate">
+            <TextBlock HorizontalAlignment="Right">
+                <Run Text="{Binding Name}"/><Run Text=": "/><Run Text="{Binding Value}"/>
+            </TextBlock>
+        </HierarchicalDataTemplate>
+        
         <local:ComplexValueTemplateSelector x:Key="ComplexValueTemplateSelector"/>
     </Window.Resources>
 
